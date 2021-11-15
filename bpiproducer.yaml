@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bpiproducer
+spec:
+  selector:
+    matchLabels:
+      app: bpiproducer
+  template:
+    metadata:
+      labels:
+        app: bpiproducer
+    spec:
+      containers:
+      - name: bpiproducer
+        image: sumyatphyoe/bpiproducer
+        env:
+        - name: RABBITMQ_HOST
+          value: "Bpi"
+        - name: RABBITMQ_PORT
+          value: "31672"
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: restproducer
+  annotations:
+    konghq.com/plugins: five-per-min
+spec:
+  type: NodePort
+  selector:
+    app: restproducer
+  ports:
+  - port: 80
+    targetPort: 5000
+    nodePort: 31500
+  
